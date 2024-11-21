@@ -1,8 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { GameModule } from './game/game.module';
 import { HealthController } from './health/health.controller';
 
@@ -14,7 +12,7 @@ import { HealthController } from './health/health.controller';
     }),
     GameModule,
   ],
-  controllers: [ HealthController],
+  controllers: [HealthController],
   providers: [],
 })
 export class AppModule {}
