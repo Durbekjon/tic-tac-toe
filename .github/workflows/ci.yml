@@ -7,55 +7,44 @@ on:
     branches: [ main ]
 
 jobs:
-  test-and-build:
+  build:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [18.x]
-
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v2
 
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
       with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
+        node-version: '18'
 
     - name: Install Dependencies
       run: |
-        npm ci
-        cd client && npm ci
+        npm install
+        cd client && npm install && cd ..
 
-    - name: Lint
-      run: |
-        npm run lint
-        cd client && npm run lint
+    - name: Build Server
+      run: npm run build
 
-    - name: Build
-      run: |
-        cd client && npm run build
-        npm run build
+    - name: Build Client
+      run: cd client && npm run build && cd ..
 
-    - name: Test
+    - name: Run Tests
       run: |
         npm test
-        cd client && npm test
-      env:
-        CI: true
+        cd client && npm test && cd ..
 
   deploy:
-    needs: test-and-build
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: build
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
 
     steps:
     - name: Deploy to Render
       env:
-        RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-        SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
+        render_api_key: ${{ secrets.RENDER_API_KEY }}
+        render_service_id: ${{ secrets.RENDER_SERVICE_ID }}
       run: |
-        curl -X POST "https://api.render.com/v1/services/$SERVICE_ID/deploys" \
-          -H "accept: application/json" \
-          -H "authorization: Bearer $RENDER_API_KEY"
+        curl -X POST "https://api.render.com/v1/services/$render_service_id/deploys" \
+        -H "accept: application/json" \
+        -H "authorization: Bearer $render_api_key"

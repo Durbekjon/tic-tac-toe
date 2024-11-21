@@ -8,11 +8,12 @@ export const SOCKET_EVENTS = {
   // Game invitation events
   SEND_GAME_INVITE: 'sendGameInvite',
   GAME_INVITE: 'gameInvite',
-  ACCEPT_GAME_INVITE: 'acceptGameInvite',
+  ACCEPT_INVITE: 'acceptInvite',
   DECLINE_GAME_INVITE: 'declineGameInvite',
   
   // Game state events
   GAME_STARTED: 'gameStarted',
+  GAME_STATE_UPDATED: 'gameStateUpdated',
   MAKE_MOVE: 'makeMove',
   MOVE_MADE: 'moveMade',
   GAME_ENDED: 'gameEnded',

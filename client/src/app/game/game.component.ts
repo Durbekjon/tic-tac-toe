@@ -129,7 +129,7 @@ export class GameComponent implements OnInit, OnDestroy {
         acceptButton.disabled = true;
       }
 
-      this.socket.emit(SOCKET_EVENTS.ACCEPT_GAME_INVITE, {
+      this.socket.emit(SOCKET_EVENTS.ACCEPT_INVITE, {
         gameId: this.pendingInvite.gameId,
         playerId: this.currentPlayerId
       });
