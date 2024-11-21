@@ -98,58 +98,38 @@ npm start
 3. First player to get three in a row (horizontally, vertically, or diagonally) wins
 4. If all spaces are filled and no player has won, the game is a draw
 
-## 🔧 Development
+## 🌐 Deployment
 
-### Project Structure
+The game is currently deployed and accessible at:
+- Frontend: https://tic-tac-toe-ij1b.onrender.com
+- Backend WebSocket: wss://tic-tac-toe-ij1b.onrender.com
 
-```
-battle-game/
-├── client/                 # Angular frontend
-│   ├── src/
-│   │   ├── app/
-│   │   │   ├── game/      # Game components
-│   │   │   └── shared/    # Shared components
-│   │   └── environments/  # Environment configs
-├── src/                   # NestJS backend
-│   ├── game/             # Game logic
-│   └── shared/           # Shared constants
-├── shared/               # Shared types
-└── docker/              # Docker configuration
-```
+### Environment Variables
 
-### Running Tests
+The following environment variables are required for deployment:
 
-```bash
-# Backend tests
-npm test
+```env
+# Server Configuration
+PORT=3000
+HOST=0.0.0.0
+NODE_ENV=production
 
-# Frontend tests
-cd client
-npm test
-```
+# WebSocket Configuration
+WS_PORT=3000
+WS_HOST=tic-tac-toe-ij1b.onrender.com
+WS_PATH=/socket.io
 
-## 📦 Deployment
+# CORS Configuration
+CORS_ORIGIN=https://tic-tac-toe-ij1b.onrender.com
 
-The application is configured for deployment on Render.com using Docker containers. The deployment process is automated through GitHub Actions.
-
-### Manual Deployment
-
-1. Build the application:
-```bash
-# Build frontend
-cd client
-npm run build
-
-# Build backend
-cd ..
-npm run build
+# Game Configuration
+MAX_PLAYERS_PER_GAME=2
+GAME_TIMEOUT_SECONDS=300
 ```
 
-2. Run using Docker:
-```bash
-docker build -t battle-game .
-docker run -p 3000:3000 battle-game
-```
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🤝 Contributing
 
@@ -159,11 +139,7 @@ docker run -p 3000:3000 battle-game
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🌟 Acknowledgments
+## 📝 Acknowledgments
 
 - Angular team for the amazing framework
 - NestJS team for the powerful backend framework
@@ -171,4 +147,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Copyright
 
-© 2024 Durbek Saydaliyev. All rights reserved.
+ 2024 Durbek Saydaliyev. All rights reserved.
