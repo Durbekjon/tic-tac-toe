@@ -34,11 +34,23 @@ COPY --from=builder /app/client/dist ./client/dist
 # Install only production dependencies
 RUN npm ci --only=production --legacy-peer-deps
 
-# Copy environment file
-COPY .env .env
+# Copy and rename environment file
+COPY .env.example .env
 
 # Expose port
 EXPOSE 3000
+
+# Set production environment
+ENV NODE_ENV=production \
+    PORT=3000 \
+    HOST=0.0.0.0 \
+    WS_PORT=3000 \
+    WS_HOST=tic-tac-toe-ij1b.onrender.com \
+    WS_PATH=/socket.io \
+    CORS_ORIGIN=https://tic-tac-toe-ij1b.onrender.com \
+    MAX_PLAYERS_PER_GAME=2 \
+    GAME_TIMEOUT_SECONDS=300 \
+    LOG_LEVEL=info
 
 # Start the application
 CMD ["npm", "run", "start:prod"]
