@@ -1,24 +1,30 @@
 export const SOCKET_EVENTS = {
   // Connection events
-  CONNECT: 'connect',
-  DISCONNECT: 'disconnect',
-  USER_CONNECTED: 'userConnected',
-  ONLINE_USERS: 'onlineUsers',
+  CONNECT: 'connect' as const,
+  DISCONNECT: 'disconnect' as const,
+  USER_CONNECTED: 'userConnected' as const,
+  ONLINE_USERS: 'onlineUsers' as const,
   
   // Game invitation events
-  SEND_GAME_INVITE: 'sendGameInvite',
-  GAME_INVITE: 'gameInvite',
-  ACCEPT_INVITE: 'acceptInvite',
-  DECLINE_GAME_INVITE: 'declineGameInvite',
+  SEND_GAME_INVITE: 'sendGameInvite' as const,
+  GAME_INVITE: 'gameInvite' as const,
+  ACCEPT_INVITE: 'acceptInvite' as const,
   
   // Game state events
-  GAME_STARTED: 'gameStarted',
-  GAME_STATE_UPDATED: 'gameStateUpdated',
-  MAKE_MOVE: 'makeMove',
-  MOVE_MADE: 'moveMade',
-  GAME_ENDED: 'gameEnded',
-  END_GAME: 'endGame',
+  MAKE_MOVE: 'makeMove' as const,
+  MOVE_MADE: 'moveMade' as const,
+  GAME_STARTED: 'gameStarted' as const,
+  GAME_ENDED: 'gameEnded' as const,
+  GAME_STATE_UPDATED: 'gameStateUpdated' as const,
+  END_GAME: 'endGame' as const,
+  
+  // User status events
+  USER_STATUS_UPDATED: 'userStatusUpdated' as const,
+  ALL_USER_STATUSES: 'allUserStatuses' as const,
+  
+  // Spectator mode events
+  JOIN_AS_SPECTATOR: 'joinAsSpectator' as const,
   
   // Error events
-  GAME_ERROR: 'gameError'
+  GAME_ERROR: 'gameError' as const,
 } as const;
