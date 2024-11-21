@@ -7,7 +7,7 @@ import { HealthController } from './health/health.controller';
 @Module({
   imports: [
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'client', 'dist', 'battle-game-client'),
+      rootPath: join(__dirname, '..', '..', 'client', 'dist', 'battle-game-client'),
       exclude: ['/api*', '/socket.io*'],
     }),
     GameModule,

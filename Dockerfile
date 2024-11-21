@@ -28,10 +28,9 @@ WORKDIR /app
 
 # Copy built files and dependencies
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/client/dist/battle-game-client ./client/dist
+COPY --from=builder /app/client ./client
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/src ./src
 
 # Set production environment
 ENV NODE_ENV=production
