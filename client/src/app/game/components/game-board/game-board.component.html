@@ -1,0 +1,34 @@
+<div class="game-board">
+  <div class="game-info">
+    <h3>Tic-Tac-Toe</h3>
+    <p *ngIf="!gameState.isGameOver" class="status-message" [class.my-turn]="isMyTurn">
+      {{ isMyTurn ? "Your turn!" : "Opponent's turn..." }}
+    </p>
+    <p *ngIf="gameState.isGameOver" class="status-message" 
+       [class.winner]="gameState.winner === gameState.players[currentPlayerId]"
+       [class.loser]="gameState.winner && gameState.winner !== gameState.players[currentPlayerId]"
+       [class.draw]="!gameState.winner">
+      {{ gameState.winner 
+          ? (gameState.winner === gameState.players[currentPlayerId] 
+             ? 'You won! 🎉' 
+             : 'Opponent won!') 
+          : "It's a draw! 🤝" }}
+    </p>
+  </div>
+
+  <div class="board">
+    <div class="row" *ngFor="let row of rows">
+      <div class="cell" [class.disabled]="!isValidMove(row * 3 + col)"
+           [class.winning-cell]="gameState.winningCombination?.includes(row * 3 + col)"
+           *ngFor="let col of cols"
+           (click)="makeMove(row * 3 + col)">
+        <ng-container *ngIf="gameState.board[row * 3 + col]">
+          <div class="symbol" [class.x]="gameState.board[row * 3 + col] === 'X'"
+                             [class.o]="gameState.board[row * 3 + col] === 'O'">
+            {{ gameState.board[row * 3 + col] }}
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>

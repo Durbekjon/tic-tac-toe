@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: battle-game
+    runtime: docker
+    region: oregon
+    plan: free
+    branch: main
+    rootDir: .
+    dockerCommand: npm run start:prod
+    envVars:
+      - key: NODE_ENV
+        value: production
+    healthCheckPath: /health
+    autoDeploy: true

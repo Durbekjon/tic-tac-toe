@@ -1,0 +1,150 @@
+.players-list {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto 30px;
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+
+  h2 {
+    color: #2c3e50;
+    font-size: 1.5em;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #ecf0f1;
+  }
+
+  .player-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    margin-bottom: 10px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    }
+
+    .player-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      .player-id {
+        font-size: 1.1em;
+        color: #34495e;
+      }
+
+      .status-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #95a5a6;
+
+        &.online {
+          background: #2ecc71;
+          box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.2);
+          animation: pulse 2s infinite;
+        }
+      }
+    }
+
+    button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      background: #3498db;
+      color: white;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover:not(:disabled) {
+        background: #2980b9;
+        transform: translateY(-1px);
+      }
+
+      &:disabled {
+        background: #bdc3c7;
+        cursor: not-allowed;
+      }
+
+      &.pending {
+        background: #27ae60;
+        animation: pendingPulse 1.5s infinite;
+      }
+    }
+  }
+
+  .no-players {
+    text-align: center;
+    padding: 30px;
+    color: #7f8c8d;
+
+    .waiting-animation {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin-bottom: 15px;
+
+      .dot {
+        width: 8px;
+        height: 8px;
+        background: #3498db;
+        border-radius: 50%;
+        animation: loadingDot 1.4s infinite ease-in-out;
+
+        &:nth-child(2) {
+          animation-delay: 0.2s;
+        }
+
+        &:nth-child(3) {
+          animation-delay: 0.4s;
+        }
+      }
+    }
+
+    p {
+      font-size: 1.1em;
+      color: #95a5a6;
+    }
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(46, 204, 113, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(46, 204, 113, 0);
+  }
+}
+
+@keyframes pendingPulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes loadingDot {
+  0%, 80%, 100% { 
+    transform: scale(0);
+  }
+  40% { 
+    transform: scale(1);
+  }
+}

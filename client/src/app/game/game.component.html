@@ -1,0 +1,51 @@
+<div class="game-container">
+  <!-- Player List -->
+  <div class="players-list" *ngIf="!pendingInvite && !gameState.isGameOver">
+    <h2>Online Players ({{onlineUsers.length}})</h2>
+    <div class="player-item" *ngFor="let userId of onlineUsers">
+      <span>Player {{userId}}</span>
+      <button (click)="invitePlayer(userId)" [disabled]="pendingInvite">
+        Invite to Play
+      </button>
+    </div>
+    <div *ngIf="onlineUsers.length === 0" class="no-players">
+      Waiting for other players to connect...
+    </div>
+  </div>
+
+  <!-- Game Invitation -->
+  <div class="invite-notification" *ngIf="pendingInvite">
+    <h3>Game Invitation</h3>
+    <p>You have been invited to play by Player {{pendingInvite.from}}!</p>
+    <div class="invite-actions">
+      <button class="accept" [disabled]="!pendingInvite" (click)="acceptInvite()">Accept</button>
+      <button class="decline" [disabled]="!pendingInvite" (click)="declineInvite()">Decline</button>
+    </div>
+  </div>
+
+  <!-- Game Board -->
+  <div class="game-board" *ngIf="gameState && Object.keys(gameState.players).length === 2">
+    <div class="game-info">
+      <h3>Tic-Tac-Toe</h3>
+      <p *ngIf="!gameState.isGameOver">
+        {{ isMyTurn() ? "Your turn!" : "Opponent's turn..." }}
+      </p>
+      <p *ngIf="gameState.isGameOver">
+        {{ gameState.winner ? (gameState.winner === gameState.players[currentPlayerId] ? 'You won!' : 'Opponent won!') : "It's a draw!" }}
+      </p>
+    </div>
+
+    <div class="board">
+      <div class="row" *ngFor="let row of [0, 1, 2]">
+        <div class="cell" 
+             *ngFor="let col of [0, 1, 2]"
+             [class.x]="gameState.board[row * 3 + col] === 'X'"
+             [class.o]="gameState.board[row * 3 + col] === 'O'"
+             [class.disabled]="!isMyTurn() || gameState.isGameOver"
+             (click)="makeMove(row * 3 + col)">
+          {{ gameState.board[row * 3 + col] }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

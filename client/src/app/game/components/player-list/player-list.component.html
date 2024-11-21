@@ -1,0 +1,24 @@
+<div class="players-list">
+  <h2>Online Players ({{players.length}})</h2>
+  
+  <div class="player-item" *ngFor="let playerId of players; trackBy: trackByPlayerId">
+    <div class="player-info">
+      <span class="player-id">Player {{playerId}}</span>
+      <span class="status-dot" [class.online]="true"></span>
+    </div>
+    <button (click)="onInviteClick(playerId)" 
+            [disabled]="pendingInvite"
+            [class.pending]="isPendingInvite(playerId)">
+      {{ isPendingInvite(playerId) ? 'Invitation Sent' : 'Invite to Play' }}
+    </button>
+  </div>
+
+  <div *ngIf="players.length === 0" class="no-players">
+    <div class="waiting-animation">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+    <p>Waiting for other players to connect...</p>
+  </div>
+</div>
