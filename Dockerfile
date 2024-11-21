@@ -8,8 +8,8 @@ COPY client/package*.json client/
 COPY shared/ shared/
 
 # Install dependencies
-RUN npm install
-RUN cd client && npm install
+RUN npm install --legacy-peer-deps
+RUN cd client && npm install --legacy-peer-deps
 
 # Copy source code
 COPY . .
