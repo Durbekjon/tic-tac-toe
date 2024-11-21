@@ -1,6 +1,9 @@
 {
   "name": "battle-game-client",
-  "version": "0.0.0",
+  "version": "0.0.1",
+  "description": "Angular client for the multiplayer Tic-Tac-Toe game",
+  "author": "Durbek Saydaliyev",
+  "license": "MIT",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",

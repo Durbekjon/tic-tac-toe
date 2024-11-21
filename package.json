@@ -1,10 +1,10 @@
 {
   "name": "battle-game",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "description": "A real-time multiplayer Tic-Tac-Toe game built with NestJS and Angular",
+  "author": "Durbek Saydaliyev",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",

@@ -1,6 +1,19 @@
-# Real-time Multiplayer Tic-Tac-Toe
+# Battle Game - Multiplayer Tic-Tac-Toe
 
-A modern, real-time multiplayer Tic-Tac-Toe game built with Angular and NestJS, featuring WebSocket communication for live gameplay.
+A real-time multiplayer Tic-Tac-Toe game built with Angular and NestJS.
+
+## Author
+
+**Durbek Saydaliyev**
+
+## Description
+
+This is a modern implementation of the classic Tic-Tac-Toe game, featuring:
+- Real-time multiplayer gameplay using WebSockets
+- Beautiful, responsive UI with Angular Material
+- Robust backend powered by NestJS
+- Player matchmaking and game state management
+- Live game updates and notifications
 
 ## 🎮 Features
 
@@ -155,3 +168,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Angular team for the amazing framework
 - NestJS team for the powerful backend framework
 - The open-source community for inspiration and support
+
+## Copyright
+
+© 2024 Durbek Saydaliyev. All rights reserved.
