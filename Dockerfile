@@ -15,10 +15,10 @@ RUN cd client && npm install --legacy-peer-deps
 COPY . .
 
 # Build client
-RUN cd client && npm run build
+RUN cd client && npm run build --force
 
 # Build server
-RUN npm run build
+RUN npm run build --force
 
 FROM node:18-alpine
 
