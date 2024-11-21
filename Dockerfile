@@ -4,36 +4,38 @@ FROM node:18-alpine AS builder
 # Set working directory
 WORKDIR /app
 
-# Copy package files
+# Copy package files for better caching
 COPY package*.json ./
 COPY client/package*.json ./client/
 
-# Install dependencies
-RUN npm install --legacy-peer-deps
-RUN cd client && npm install --legacy-peer-deps
+# Install dependencies with clean install for production
+RUN npm ci --legacy-peer-deps
+RUN cd client && npm ci --legacy-peer-deps
 
 # Copy source code
 COPY . .
 
-# Build client
-RUN cd client && npm run build --force
+# Build client with production configuration
+RUN cd client && npm run build
 
 # Build server
-RUN npm run build --force
+RUN npm run build
 
 # Production stage
 FROM node:18-alpine
 
 WORKDIR /app
 
-# Copy built files and dependencies
+# Copy package files for production
+COPY package*.json ./
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/client ./client
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/client/dist ./client/dist
 
-# Set production environment
-ENV NODE_ENV=production
+# Install only production dependencies
+RUN npm ci --only=production --legacy-peer-deps
+
+# Copy environment file
+COPY .env .env
 
 # Expose port
 EXPOSE 3000

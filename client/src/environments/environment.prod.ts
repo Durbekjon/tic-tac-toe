@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  wsUrl: 'https://tic-tac-toe-ij1b.onrender.com',
+  wsUrl: 'wss://tic-tac-toe-ij1b.onrender.com',
 };
