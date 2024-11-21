@@ -25,8 +25,10 @@ interface GameState {
 
 @WebSocketGateway({
   cors: {
-    origin: '*',
+    origin: ['http://localhost:4200', 'https://tic-tac-toe-ij1b.onrender.com'],
+    credentials: true,
   },
+  transports: ['websocket', 'polling'],
 })
 export class GameGateway {
   @WebSocketServer()
@@ -57,6 +59,20 @@ export class GameGateway {
     console.log('User connected:', data.userId);
     this.onlineUsers.set(client.id, data.userId);
     this.broadcastOnlineUsers();
+    
+    // Immediately send the current list of online users back to the connected client
+    client.emit(SOCKET_EVENTS.ONLINE_USERS, this.getOnlineUsers());
+  }
+
+  private broadcastOnlineUsers() {
+    const users = this.getOnlineUsers();
+    console.log('Broadcasting online users:', users);
+    this.server.emit(SOCKET_EVENTS.ONLINE_USERS, users);
+  }
+
+  private getOnlineUsers(): string[] {
+    const uniqueUsers = new Set(this.onlineUsers.values());
+    return Array.from(uniqueUsers);
   }
 
   @SubscribeMessage(SOCKET_EVENTS.SEND_GAME_INVITE)
@@ -81,12 +97,12 @@ export class GameGateway {
     // Initialize waiting game state
     const initialGameState: GameState = {
       board: Array(9).fill(''),
-      currentPlayer: '',
+      currentPlayer: data.from, // Set the inviter as the first player
       winner: null,
       isGameOver: false,
       players: {
-        [data.from]: '',
-        [data.to]: '',
+        [data.from]: 'X',
+        [data.to]: 'O',
       },
       status: 'waiting',
       gameId
@@ -101,70 +117,30 @@ export class GameGateway {
     });
   }
 
-  @SubscribeMessage(SOCKET_EVENTS.ACCEPT_GAME_INVITE)
+  @SubscribeMessage(SOCKET_EVENTS.ACCEPT_INVITE)
   async handleAcceptInvite(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: { gameId: string; playerId: string },
   ) {
-    console.log('Backend received accept invite:', data);
-    console.log('Current games:', Array.from(this.games.entries()));
-
     const game = this.games.get(data.gameId);
     if (!game) {
-      console.log('Game not found:', data.gameId);
-      client.emit(SOCKET_EVENTS.GAME_ERROR, { message: 'Game not found' });
+      client.emit(SOCKET_EVENTS.GAME_ERROR, {
+        message: 'Game not found',
+      });
       return;
     }
 
-    console.log('Found game:', game);
+    game.status = 'in-progress';
+    this.games.set(data.gameId, game);
 
-    // Initialize game state for Tic-tac-toe
-    const gameState: GameState = {
-      board: Array(9).fill(''),
-      currentPlayer: 'X',
-      winner: null,
-      isGameOver: false,
-      players: {},
-      status: 'in-progress',
-      gameId: data.gameId
-    };
-
-    // Assign X and O to players
+    // Add both players to the active games map
     const players = Object.keys(game.players);
-    console.log('Players in game:', players);
-
-    gameState.players[players[0]] = 'X';
-    gameState.players[players[1]] = 'O';
-
-    console.log('Initialized game state:', gameState);
-
-    // Update game in memory
-    this.games.set(data.gameId, gameState);
-
-    // Store active game reference
     players.forEach(playerId => {
       this.activeGames.set(playerId, data.gameId);
     });
 
-    // Find socket IDs for both players
-    const playerSockets = players
-      .map(playerId => {
-        const socketId = Array.from(this.onlineUsers.entries())
-          .find(([_, userId]) => userId === playerId)?.[0];
-        console.log(`Found socket for player ${playerId}:`, socketId);
-        return socketId;
-      })
-      .filter(socketId => socketId);
-
-    console.log('Player sockets to notify:', playerSockets);
-
-    // Notify all players about game start
-    playerSockets.forEach(socketId => {
-      if (socketId) {
-        console.log('Emitting game started to socket:', socketId);
-        this.server.to(socketId).emit(SOCKET_EVENTS.GAME_STARTED, gameState);
-      }
-    });
+    // Broadcast the updated game state to both players
+    this.server.emit(SOCKET_EVENTS.GAME_STATE_UPDATED, game);
   }
 
   @SubscribeMessage(SOCKET_EVENTS.MAKE_MOVE)
@@ -173,28 +149,34 @@ export class GameGateway {
     @MessageBody() data: { gameId: string; playerId: string; position: number },
   ) {
     const game = this.games.get(data.gameId);
-    if (!game) {
-      client.emit(SOCKET_EVENTS.GAME_ERROR, { message: 'Game not found' });
+    if (!game || game.status !== 'in-progress') {
+      client.emit(SOCKET_EVENTS.GAME_ERROR, {
+        message: 'Invalid game or game not in progress',
+      });
       return;
     }
 
-    // Validate move
-    if (
-      game.board[data.position] ||
-      game.isGameOver ||
-      game.players[data.playerId] !== game.currentPlayer
-    ) {
-      client.emit(SOCKET_EVENTS.GAME_ERROR, { message: 'Invalid move' });
+    if (game.currentPlayer !== data.playerId) {
+      client.emit(SOCKET_EVENTS.GAME_ERROR, {
+        message: 'Not your turn',
+      });
       return;
     }
 
-    // Make move
+    if (game.board[data.position] !== '') {
+      client.emit(SOCKET_EVENTS.GAME_ERROR, {
+        message: 'Position already taken',
+      });
+      return;
+    }
+
+    // Make the move
     game.board[data.position] = game.players[data.playerId];
 
-    // Check for win or draw
+    // Check for winner
     const winner = this.checkWinner(game.board);
     if (winner) {
-      game.winner = winner;
+      game.winner = data.playerId;
       game.isGameOver = true;
       game.status = 'finished';
     } else if (this.isDraw(game.board)) {
@@ -202,43 +184,25 @@ export class GameGateway {
       game.status = 'finished';
     } else {
       // Switch turns
-      game.currentPlayer = game.currentPlayer === 'X' ? 'O' : 'X';
+      const players = Object.keys(game.players);
+      game.currentPlayer = players.find(id => id !== data.playerId)!;
     }
 
-    // Update game state
     this.games.set(data.gameId, game);
 
-    // Notify all players
-    Object.keys(game.players).forEach(playerId => {
-      const socketId = Array.from(this.onlineUsers.entries())
-        .find(([_, userId]) => userId === playerId)?.[0];
-      if (socketId) {
-        this.server.to(socketId).emit(SOCKET_EVENTS.MOVE_MADE, game);
-      }
-    });
-
-    // If game is over, clean up
-    if (game.isGameOver) {
-      Object.keys(game.players).forEach(playerId => {
-        this.activeGames.delete(playerId);
-      });
-      this.games.delete(data.gameId);
-    }
+    // Broadcast the updated game state
+    this.server.emit(SOCKET_EVENTS.GAME_STATE_UPDATED, game);
   }
 
   private checkWinner(board: string[]): string | null {
-    const lines = [
-      [0, 1, 2],
-      [3, 4, 5],
-      [6, 7, 8],
-      [0, 3, 6],
-      [1, 4, 7],
-      [2, 5, 8],
-      [0, 4, 8],
-      [2, 4, 6],
+    const winPatterns = [
+      [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+      [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+      [0, 4, 8], [2, 4, 6] // Diagonals
     ];
 
-    for (const [a, b, c] of lines) {
+    for (const pattern of winPatterns) {
+      const [a, b, c] = pattern;
       if (board[a] && board[a] === board[b] && board[a] === board[c]) {
         return board[a];
       }
@@ -250,37 +214,28 @@ export class GameGateway {
     return board.every(cell => cell !== '');
   }
 
-  private broadcastOnlineUsers() {
-    const users = Array.from(this.onlineUsers.values());
-    this.server.emit(SOCKET_EVENTS.ONLINE_USERS, { users });
-  }
-
   @SubscribeMessage(SOCKET_EVENTS.END_GAME)
   async handleEndGame(
     @ConnectedSocket() client: Socket,
     @MessageBody() data: { gameId: string; winner: string },
   ) {
     const game = this.games.get(data.gameId);
-    if (!game) return;
+    if (!game) {
+      return;
+    }
 
+    game.winner = data.winner;
+    game.isGameOver = true;
     game.status = 'finished';
 
-    // Clean up game references
-    Object.keys(game.players).forEach((playerId) => {
+    this.games.set(data.gameId, game);
+
+    // Remove the game from active games
+    Object.keys(game.players).forEach(playerId => {
       this.activeGames.delete(playerId);
     });
 
-    // Notify all players about game end
-    this.server.to(data.gameId).emit(SOCKET_EVENTS.GAME_ENDED, {
-      gameId: data.gameId,
-      winner: data.winner,
-    });
-
-    // Remove the game from memory
-    this.games.delete(data.gameId);
-  }
-
-  getOnlineUsers(): string[] {
-    return Array.from(this.onlineUsers.values());
+    // Broadcast the final game state
+    this.server.emit(SOCKET_EVENTS.GAME_STATE_UPDATED, game);
   }
 }

@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  wsUrl: 'wss://battle-game.onrender.com', // Production WebSocket URL
+  wsUrl: 'https://tic-tac-toe-ij1b.onrender.com', // NestJS WebSocket server URL for production
 };
