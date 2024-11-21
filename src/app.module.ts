@@ -9,12 +9,12 @@ import { HealthController } from './health/health.controller';
 @Module({
   imports: [
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'client', 'dist'),
+      rootPath: join(__dirname, '..', 'client', 'dist', 'battle-game-client'),
       exclude: ['/api*', '/socket.io*'],
     }),
     GameModule,
   ],
-  controllers: [AppController, HealthController],
-  providers: [AppService],
+  controllers: [ HealthController],
+  providers: [],
 })
 export class AppModule {}

@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: battle-game
+    name: tic-tac-toe
     runtime: docker
     region: oregon
     plan: free
